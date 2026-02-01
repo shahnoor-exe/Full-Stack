@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>E-commerce Product Page by Shahnoor!!</title>
+    <style>
+        body { font-size: 24px; }
+        h1 { font-size: 36px; }
+        label { font-size: 24px; }
+        select { font-size: 22px; padding: 10px; }
+        option { font-size: 22px; }
+        p { font-size: 22px; }
+    </style>
+</head>
+<body>
+    <h1>Product List</h1>
+
+    <label>Filter by Category:</label>
+    <select id="categoryFilter">
+        <option value="all">All</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Clothing">Clothing</option>
+        <option value="Books">Books</option>
+        <option value="Sports">Sports</option>
+    </select>
+
+    <label>Sort by:</label>
+    <select id="sortBy">
+        <option value="none">None</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="name-asc">Name: A to Z</option>
+        <option value="name-desc">Name: Z to A</option>
+        <option value="rating-asc">Rating: Low to High</option>
+        <option value="rating-desc">Rating: High to Low</option>
+    </select>
+
+    <br><br>
+    <div id="productList"></div>
+
+    <script src="task2.js"></script>
+</body>
+</html>
