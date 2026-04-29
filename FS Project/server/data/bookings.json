@@ -1,0 +1,74 @@
+[
+  {
+    "id": "B1712345678",
+    "spotId": 1,
+    "spotName": "Andheri West Station",
+    "city": "Mumbai",
+    "area": "Andheri West",
+    "vehicleNumber": "MH01 AB 1234",
+    "hours": 2,
+    "totalPrice": 80,
+    "status": "cancelled",
+    "date": "2026-04-13"
+  },
+  {
+    "id": "B1712345679",
+    "spotId": 2,
+    "spotName": "BKC Smart Parking",
+    "city": "Mumbai",
+    "area": "BKC",
+    "vehicleNumber": "MH01 CD 5678",
+    "hours": 3,
+    "totalPrice": 180,
+    "status": "completed",
+    "date": "2026-04-12"
+  },
+  {
+    "id": "B1712345680",
+    "spotId": 6,
+    "spotName": "KP Tech Park Parking",
+    "city": "Pune",
+    "area": "Koregaon Park",
+    "vehicleNumber": "MH12 XY 9999",
+    "hours": 1,
+    "totalPrice": 40,
+    "status": "cancelled",
+    "date": "2026-04-13"
+  },
+  {
+    "id": "B1712345681",
+    "spotId": 9,
+    "spotName": "MG Road Central",
+    "city": "Bengaluru",
+    "area": "MG Road",
+    "vehicleNumber": "KA01 EF 2468",
+    "hours": 4,
+    "totalPrice": 320,
+    "status": "active",
+    "date": "2026-04-13"
+  },
+  {
+    "id": "B1712345682",
+    "spotId": 12,
+    "spotName": "Whitefield IT Hub",
+    "city": "Bengaluru",
+    "area": "Whitefield",
+    "vehicleNumber": "KA51 MG 1111",
+    "hours": 5,
+    "totalPrice": 250,
+    "status": "waiting",
+    "date": "2026-04-13"
+  },
+  {
+    "spotId": 2,
+    "spotName": "BKC Smart Parking",
+    "city": "Mumbai",
+    "area": "BKC",
+    "vehicleNumber": "AS11AB2409",
+    "hours": 2,
+    "totalPrice": 120,
+    "id": "B1777478517244",
+    "status": "cancelled",
+    "date": "2026-04-29"
+  }
+]

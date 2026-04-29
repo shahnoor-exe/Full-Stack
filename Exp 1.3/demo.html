@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProductCard Component - Experiment Demo</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .product-card {
+            border: 1px solid black;
+            padding: 10px;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 200px;
+        }
+
+        .stock-badge {
+            padding: 5px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .in-stock {
+            color: green;
+        }
+
+        .out-of-stock {
+            color: red;
+        }
+
+        .product-details {
+            margin-top: 10px;
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .product-description {
+            margin: 10px 0;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .buy-button {
+            padding: 10px 20px;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .buy-button:disabled {
+            background: gray;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>ProductCard Component</h1>
+    </div>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // ProductCard Component
+        function ProductCard(props) {
+            const { name, price, image, description, inStock } = props;
+
+            return (
+                <div className="product-card">
+                    <div className="product-image">
+                        <img src={image} alt={name} />
+                    </div>
+                    <div className={inStock ? 'stock-badge in-stock' : 'stock-badge out-of-stock'}>
+                        {inStock ? 'In Stock' : 'Out of Stock'}
+                    </div>
+
+                    <div className="product-details">
+                        <h3 className="product-name">{name}</h3>
+                        <p className="product-description">{description}</p>
+                        <p className="product-price">${price}</p>
+                        <button className="buy-button" disabled={!inStock}>
+                            {inStock ? 'Add to Cart' : 'Unavailable'}
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // App Component
+        function App() {
+            const products = [
+                {
+                    id: 1,
+                    name: 'Wireless Mouse',
+                    price: 29.99,
+                    description: 'Ergonomic wireless mouse with smooth tracking',
+                    image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=300&fit=crop',
+                    inStock: true
+                },
+                {
+                    id: 2,
+                    name: 'Coffee Mug',
+                    price: 12.50,
+                    description: 'Ceramic mug perfect for your morning coffee',
+                    image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=300&fit=crop',
+                    inStock: true
+                },
+                {
+                    id: 3,
+                    name: 'Notebook',
+                    price: 8.99,
+                    description: 'Premium quality notebook with 200 pages',
+                    image: 'https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=400&h=300&fit=crop',
+                    inStock: false
+                },
+                {
+                    id: 4,
+                    name: 'Desk Lamp',
+                    price: 45.00,
+                    description: 'LED desk lamp with adjustable brightness',
+                    image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&h=300&fit=crop',
+                    inStock: true
+                },
+                {
+                    id: 5,
+                    name: 'Water Bottle',
+                    price: 15.99,
+                    description: 'Stainless steel insulated water bottle',
+                    image: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=300&fit=crop',
+                    inStock: true
+                },
+                {
+                    id: 6,
+                    name: 'Backpack',
+                    price: 59.99,
+                    description: 'Spacious backpack with laptop compartment',
+                    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop',
+                    inStock: false
+                }
+            ];
+
+            return (
+                <div className="products-grid">
+                    {products.map(product => (
+                        <ProductCard
+                            key={product.id}
+                            name={product.name}
+                            price={product.price}
+                            image={product.image}
+                            description={product.description}
+                            inStock={product.inStock}
+                        />
+                    ))}
+                </div>
+            );
+        }
+
+        // Render App
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "fs-project",
+  "version": "1.0.0",
+  "description": "ParkEase is a beginner-level urban parking platform for Indian cities.",
+  "main": "index.js",
+  "scripts": {
+    "start:server": "cd server && node server.js",
+    "start:client": "cd client && npm start",
+    "start": "npx concurrently \"npm run start:server\" \"npm run start:client\"",
+    "install:all": "cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

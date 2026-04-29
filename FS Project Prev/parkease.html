@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParkEase – Find & List Parking in Your City</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root, [data-theme="light"] {
+      --color-bg:             #f7f6f2;
+      --color-surface:        #ffffff;
+      --color-surface-2:      #f3f0ec;
+      --color-border:         #d4d1ca;
+      --color-divider:        #e5e3de;
+      --color-text:           #28251d;
+      --color-text-muted:     #7a7974;
+      --color-text-faint:     #bab9b4;
+      --color-primary:        #01696f;
+      --color-primary-hover:  #0c4e54;
+      --color-primary-light:  #e6f2f3;
+      --color-success:        #437a22;
+      --color-success-light:  #edf5e8;
+      --color-warning:        #964219;
+      --color-warning-light:  #fdf0ea;
+      --color-error:          #b91c1c;
+      --color-error-light:    #fef2f2;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.09);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
+      --font-body: 'Inter', sans-serif;
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+      --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
+      --text-xs: 12px; --text-sm: 14px; --text-base: 16px;
+      --text-lg: 18px; --text-xl: 22px;
+    }
+    [data-theme="dark"] {
+      --color-bg:             #171614;
+      --color-surface:        #1c1b19;
+      --color-surface-2:      #252422;
+      --color-border:         #393836;
+      --color-divider:        #2a2927;
+      --color-text:           #cdccca;
+      --color-text-muted:     #797876;
+      --color-text-faint:     #5a5957;
+      --color-primary:        #4f98a3;
+      --color-primary-hover:  #227f8b;
+      --color-primary-light:  #1e3335;
+      --color-success:        #6daa45;
+      --color-success-light:  #1e2e18;
+      --color-warning:        #bb653b;
+      --color-warning-light:  #2a1c12;
+      --color-error:          #f87171;
+      --color-error-light:    #2d1515;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    /* ===== BASE RESET ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.6;
+    }
+    img { display: block; max-width: 100%; }
+    input, select, textarea, button { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: none; }
+    ul { list-style: none; }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-3) var(--space-6);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .navbar-logo {
+      display: flex; align-items: center; gap: var(--space-2);
+      font-size: var(--text-lg); font-weight: 700;
+      color: var(--color-primary); text-decoration: none;
+    }
+    .navbar-logo svg { width: 28px; height: 28px; }
+    .navbar-nav {
+      display: flex; align-items: center; gap: var(--space-1);
+    }
+    .nav-btn {
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm); font-weight: 500;
+      color: var(--color-text-muted);
+      transition: background 0.18s, color 0.18s;
+      display: flex; align-items: center; gap: var(--space-2);
+    }
+    .nav-btn:hover { background: var(--color-surface-2); color: var(--color-text); }
+    .nav-btn.active { background: var(--color-primary-light); color: var(--color-primary); font-weight: 600; }
+    .navbar-right { display: flex; align-items: center; gap: var(--space-3); }
+    .theme-toggle {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-muted);
+      transition: background 0.18s, color 0.18s;
+    }
+    .theme-toggle:hover { background: var(--color-surface-2); color: var(--color-text); }
+
+    /* ===== PAGE CONTAINER ===== */
+    .page { display: none; }
+    .page.active { display: block; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 var(--space-6); }
+
+    /* ===== HERO / HOME ===== */
+    .hero {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-10) var(--space-6);
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      font-size: var(--text-xs); font-weight: 600;
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      margin-bottom: var(--space-4);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .hero h1 { font-size: var(--text-xl); font-weight: 700; color: var(--color-text); margin-bottom: var(--space-3); }
+    .hero p { font-size: var(--text-base); color: var(--color-text-muted); max-width: 520px; margin: 0 auto var(--space-6); }
+    .hero-cards { display: flex; gap: var(--space-4); justify-content: center; flex-wrap: wrap; }
+    .hero-card {
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      width: 220px;
+      cursor: pointer;
+      transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+      text-align: center;
+    }
+    .hero-card:hover { border-color: var(--color-primary); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .hero-card-icon {
+      width: 48px; height: 48px;
+      background: var(--color-primary-light);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto var(--space-3);
+      color: var(--color-primary);
+    }
+    .hero-card h3 { font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-1); }
+    .hero-card p { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+    /* ===== STATS BAR ===== */
+    .stats-bar {
+      display: flex; flex-wrap: wrap;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-surface);
+    }
+    .stat-item {
+      flex: 1; min-width: 140px;
+      padding: var(--space-5) var(--space-6);
+      border-right: 1px solid var(--color-border);
+      text-align: center;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-number { font-size: var(--text-xl); font-weight: 700; color: var(--color-primary); }
+    .stat-label { font-size: var(--text-sm); color: var(--color-text-muted); margin-top: 2px; }
+
+    /* ===== SECTION HEADER ===== */
+    .section-header {
+      padding: var(--space-8) 0 var(--space-5);
+    }
+    .section-header h2 { font-size: var(--text-xl); font-weight: 700; margin-bottom: var(--space-1); }
+    .section-header p { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+    /* ===== SEARCH BAR ===== */
+    .search-bar {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-5);
+      display: flex; align-items: center; gap: var(--space-3);
+      flex-wrap: wrap;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-5);
+    }
+    .search-field {
+      display: flex; align-items: center; gap: var(--space-2);
+      flex: 1; min-width: 160px;
+    }
+    .search-field label { font-size: var(--text-xs); font-weight: 600; color: var(--color-text-muted); white-space: nowrap; text-transform: uppercase; letter-spacing: 0.04em; }
+    .search-field select, .search-field input {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-bg);
+      font-size: var(--text-sm);
+      color: var(--color-text);
+      outline: none;
+      width: 100%;
+      transition: border-color 0.18s;
+    }
+    .search-field select:focus, .search-field input:focus { border-color: var(--color-primary); }
+    .search-divider { width: 1px; height: 36px; background: var(--color-border); }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+      padding: var(--space-2) var(--space-5);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm); font-weight: 600;
+      transition: background 0.18s, transform 0.12s;
+      border: none; cursor: pointer;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--color-primary); color: #fff; }
+    .btn-primary:hover { background: var(--color-primary-hover); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+    .btn-outline:hover { background: var(--color-surface-2); }
+    .btn-sm { padding: var(--space-1) var(--space-3); font-size: var(--text-xs); }
+    .btn-success { background: var(--color-success); color: #fff; }
+    .btn-success:hover { opacity: 0.9; }
+    .btn-danger { background: var(--color-error); color: #fff; }
+
+    /* ===== PARKING CARDS GRID ===== */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--space-4);
+      padding-bottom: var(--space-10);
+    }
+    .parking-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.18s, transform 0.18s;
+    }
+    .parking-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .card-header {
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--color-divider);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-2);
+    }
+    .card-title { font-size: var(--text-base); font-weight: 600; margin-bottom: 2px; }
+    .card-address { font-size: var(--text-xs); color: var(--color-text-muted); display: flex; align-items: center; gap: 4px; }
+    .card-body { padding: var(--space-4); }
+    .card-meta {
+      display: flex; flex-wrap: wrap; gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+    .meta-item {
+      display: flex; align-items: center; gap: var(--space-1);
+      font-size: var(--text-xs); color: var(--color-text-muted);
+    }
+    .meta-item strong { color: var(--color-text); font-weight: 600; }
+    .card-footer {
+      padding: var(--space-3) var(--space-4);
+      border-top: 1px solid var(--color-divider);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .price-tag { font-size: var(--text-base); font-weight: 700; color: var(--color-primary); }
+    .price-tag span { font-size: var(--text-xs); font-weight: 400; color: var(--color-text-muted); }
+
+    /* ===== BADGES ===== */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: var(--radius-full);
+      font-size: var(--text-xs); font-weight: 600;
+    }
+    .badge-available { background: var(--color-success-light); color: var(--color-success); }
+    .badge-full { background: var(--color-error-light); color: var(--color-error); }
+    .badge-limited { background: var(--color-warning-light); color: var(--color-warning); }
+    .badge-car { background: var(--color-primary-light); color: var(--color-primary); }
+    .badge-bike { background: #eef2ff; color: #4f46e5; }
+    .badge-both { background: #fdf4e7; color: #92400e; }
+    [data-theme="dark"] .badge-bike { background: #1e1b4b; color: #818cf8; }
+    [data-theme="dark"] .badge-both { background: #2a1f0a; color: #fbbf24; }
+
+    /* ===== FILTERS ROW ===== */
+    .filters-row {
+      display: flex; align-items: center; gap: var(--space-2);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-4);
+    }
+    .filter-chip {
+      padding: var(--space-1) var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs); font-weight: 500;
+      cursor: pointer; background: var(--color-surface);
+      color: var(--color-text-muted);
+      transition: all 0.15s;
+    }
+    .filter-chip:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .filter-chip.active { background: var(--color-primary-light); border-color: var(--color-primary); color: var(--color-primary); font-weight: 600; }
+    .results-count { font-size: var(--text-sm); color: var(--color-text-muted); margin-left: auto; }
+
+    /* ===== FORM PAGE (LIST YOUR SPACE) ===== */
+    .form-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8);
+      max-width: 640px;
+      margin: 0 auto var(--space-10);
+      box-shadow: var(--shadow-sm);
+    }
+    .form-card h2 { font-size: var(--text-xl); font-weight: 700; margin-bottom: var(--space-1); }
+    .form-card p { font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-6); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+    .form-group { margin-bottom: var(--space-4); }
+    .form-group label {
+      display: block;
+      font-size: var(--text-sm); font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: var(--space-1);
+    }
+    .form-group label span { color: var(--color-error); }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-bg);
+      font-size: var(--text-sm);
+      color: var(--color-text);
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(1,105,111,0.12);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-hint { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 4px; }
+    .form-divider { border: none; border-top: 1px solid var(--color-divider); margin: var(--space-5) 0; }
+    .form-section-title { font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-3); color: var(--color-text); }
+    .checkbox-group { display: flex; gap: var(--space-4); flex-wrap: wrap; }
+    .checkbox-label {
+      display: flex; align-items: center; gap: var(--space-2);
+      font-size: var(--text-sm); cursor: pointer;
+    }
+    .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--color-primary); cursor: pointer; }
+
+    /* ===== BOOKINGS PAGE ===== */
+    .bookings-list { padding-bottom: var(--space-10); }
+    .booking-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-bottom: var(--space-3);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: var(--space-4); flex-wrap: wrap;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.18s;
+    }
+    .booking-card:hover { box-shadow: var(--shadow-md); }
+    .booking-info { flex: 1; }
+    .booking-name { font-size: var(--text-base); font-weight: 600; margin-bottom: 2px; }
+    .booking-details { font-size: var(--text-sm); color: var(--color-text-muted); display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-1); }
+    .booking-actions { display: flex; gap: var(--space-2); }
+    .booking-status { display: flex; align-items: center; gap: var(--space-2); }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-10) var(--space-8);
+      color: var(--color-text-muted);
+    }
+    .empty-state-icon {
+      width: 56px; height: 56px;
+      background: var(--color-surface-2);
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto var(--space-4);
+      color: var(--color-text-faint);
+    }
+    .empty-state h3 { font-size: var(--text-base); font-weight: 600; color: var(--color-text); margin-bottom: var(--space-2); }
+    .empty-state p { font-size: var(--text-sm); max-width: 320px; margin: 0 auto var(--space-5); }
+
+    /* ===== TOAST ===== */
+    .toast-container {
+      position: fixed; bottom: var(--space-6); right: var(--space-6);
+      z-index: 9999; display: flex; flex-direction: column; gap: var(--space-2);
+    }
+    .toast {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      box-shadow: var(--shadow-md);
+      display: flex; align-items: center; gap: var(--space-3);
+      font-size: var(--text-sm); font-weight: 500;
+      min-width: 280px; max-width: 380px;
+      animation: toastIn 0.2s ease-out;
+    }
+    .toast-success { border-left: 3px solid var(--color-success); }
+    .toast-error { border-left: 3px solid var(--color-error); }
+    .toast-icon { flex-shrink: 0; }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 500;
+      display: none; align-items: center; justify-content: center;
+      padding: var(--space-4);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      width: 100%; max-width: 440px;
+      box-shadow: var(--shadow-md);
+      animation: modalIn 0.2s ease-out;
+    }
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+    .modal-header h3 { font-size: var(--text-lg); font-weight: 700; }
+    .modal-close { color: var(--color-text-muted); padding: var(--space-1); border-radius: var(--radius-sm); }
+    .modal-close:hover { background: var(--color-surface-2); color: var(--color-text); }
+    .modal-body { margin-bottom: var(--space-5); }
+    .modal-detail-row { display: flex; justify-content: space-between; align-items: center; padding: var(--space-2) 0; border-bottom: 1px solid var(--color-divider); font-size: var(--text-sm); }
+    .modal-detail-row:last-child { border-bottom: none; }
+    .modal-detail-label { color: var(--color-text-muted); }
+    .modal-detail-value { font-weight: 600; }
+    .modal-footer { display: flex; gap: var(--space-3); justify-content: flex-end; }
+    .modal-info {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-4);
+      display: flex; gap: var(--space-2); align-items: center;
+    }
+
+    /* ===== MY LISTINGS PAGE ===== */
+    .tabs {
+      display: flex; gap: var(--space-1);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-5);
+    }
+    .tab-btn {
+      padding: var(--space-2) var(--space-4);
+      font-size: var(--text-sm); font-weight: 500;
+      color: var(--color-text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--color-text); }
+    .tab-btn.active { color: var(--color-primary); border-bottom-color: var(--color-primary); font-weight: 600; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      .navbar-nav .nav-btn span { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+      .hero-cards { flex-direction: column; align-items: center; }
+      .stats-bar { flex-direction: column; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--color-border); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <a class="navbar-logo" href="#" onclick="showPage('home')">
+      <!-- SVG Logo: P inside a parking symbol -->
+      <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="ParkEase logo">
+        <rect width="28" height="28" rx="7" fill="currentColor"/>
+        <text x="7" y="21" font-family="Inter,sans-serif" font-size="17" font-weight="800" fill="#fff">P</text>
+      </svg>
+      ParkEase
+    </a>
+    <div class="navbar-nav">
+      <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
+        <i data-lucide="home" style="width:15px;height:15px"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-btn" id="nav-find" onclick="showPage('find')">
+        <i data-lucide="search" style="width:15px;height:15px"></i>
+        <span>Find Parking</span>
+      </button>
+      <button class="nav-btn" id="nav-list" onclick="showPage('list')">
+        <i data-lucide="plus-circle" style="width:15px;height:15px"></i>
+        <span>List Space</span>
+      </button>
+      <button class="nav-btn" id="nav-bookings" onclick="showPage('bookings')">
+        <i data-lucide="bookmark" style="width:15px;height:15px"></i>
+        <span>My Bookings</span>
+      </button>
+    </div>
+    <div class="navbar-right">
+      <button class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">
+        <i data-lucide="moon" style="width:17px;height:17px"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== HOME PAGE ===== -->
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-badge">
+        <i data-lucide="map-pin" style="width:11px;height:11px"></i>
+        Available in 6 cities across India
+      </div>
+      <h1>No More Parking Headaches in Your City</h1>
+      <p>Find affordable, verified parking spots near you in seconds — or earn money by sharing your empty space with drivers nearby.</p>
+      <div class="hero-cards">
+        <div class="hero-card" onclick="showPage('find')">
+          <div class="hero-card-icon">
+            <i data-lucide="search" style="width:22px;height:22px"></i>
+          </div>
+          <h3>Find Parking</h3>
+          <p>Search nearby spots by city and vehicle type</p>
+        </div>
+        <div class="hero-card" onclick="showPage('list')">
+          <div class="hero-card-icon">
+            <i data-lucide="plus-circle" style="width:22px;height:22px"></i>
+          </div>
+          <h3>List Your Space</h3>
+          <p>Register your parking area and earn money</p>
+        </div>
+        <div class="hero-card" onclick="showPage('bookings')">
+          <div class="hero-card-icon">
+            <i data-lucide="bookmark" style="width:22px;height:22px"></i>
+          </div>
+          <h3>My Bookings</h3>
+          <p>View and manage your active reservations</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-number" id="stat-spots">0</div>
+        <div class="stat-label">Parking Spots Listed</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">6</div>
+        <div class="stat-label">Cities Covered</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="stat-bookings">0</div>
+        <div class="stat-label">Bookings Today</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="stat-owners">0</div>
+        <div class="stat-label">Space Owners</div>
+      </div>
+    </div>
+
+    <div class="container" style="padding-top: var(--space-8); padding-bottom: var(--space-10);">
+      <h2 style="font-size: var(--text-lg); font-weight: 700; margin-bottom: var(--space-4);">Supported Cities</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: var(--space-3);">
+        <div id="city-cards-home"></div>
+      </div>
+      <div id="city-pills" style="display: flex; flex-wrap: wrap; gap: var(--space-2);"></div>
+
+      <div style="margin-top: var(--space-8);">
+        <h2 style="font-size: var(--text-lg); font-weight: 700; margin-bottom: var(--space-4);">How It Works</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-4);">
+          <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-5);">
+            <div style="font-size: 22px; font-weight: 800; color: var(--color-primary); margin-bottom: var(--space-2);">01</div>
+            <div style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-1);">Search Your City</div>
+            <div style="font-size: var(--text-sm); color: var(--color-text-muted);">Select your city and vehicle type to see all available spots.</div>
+          </div>
+          <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-5);">
+            <div style="font-size: 22px; font-weight: 800; color: var(--color-primary); margin-bottom: var(--space-2);">02</div>
+            <div style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-1);">Pick a Spot</div>
+            <div style="font-size: var(--text-sm); color: var(--color-text-muted);">Choose from verified spots — see price, distance, and available slots.</div>
+          </div>
+          <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-5);">
+            <div style="font-size: 22px; font-weight: 800; color: var(--color-primary); margin-bottom: var(--space-2);">03</div>
+            <div style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-1);">Book & Park</div>
+            <div style="font-size: var(--text-sm); color: var(--color-text-muted);">Reserve your spot and head there. No circling, no stress.</div>
+          </div>
+          <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-5);">
+            <div style="font-size: 22px; font-weight: 800; color: var(--color-primary); margin-bottom: var(--space-2);">04</div>
+            <div style="font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-1);">Earn as Owner</div>
+            <div style="font-size: var(--text-sm); color: var(--color-text-muted);">Register your empty space and earn ₹ passively from drivers.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FIND PARKING PAGE ===== -->
+  <div class="page" id="page-find">
+    <div class="container">
+      <div class="section-header">
+        <h2>Find Parking</h2>
+        <p>Search available parking spots near you by city and vehicle type</p>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <div class="search-field">
+          <label>City</label>
+          <select id="search-city" onchange="renderParkingCards()">
+            <option value="">All Cities</option>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Pune">Pune</option>
+            <option value="Bengaluru">Bengaluru</option>
+            <option value="Hyderabad">Hyderabad</option>
+            <option value="Kanpur">Kanpur</option>
+            <option value="Girgaon">Girgaon</option>
+          </select>
+        </div>
+        <div class="search-divider"></div>
+        <div class="search-field">
+          <label>Area / Keyword</label>
+          <input type="text" id="search-keyword" placeholder="e.g. Andheri, MG Road…" oninput="renderParkingCards()" />
+        </div>
+        <div class="search-divider"></div>
+        <div class="search-field">
+          <label>Vehicle</label>
+          <select id="search-vehicle" onchange="renderParkingCards()">
+            <option value="">Any</option>
+            <option value="Car">Car</option>
+            <option value="Bike">Bike / Two-Wheeler</option>
+            <option value="Both">Both</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Filter Chips -->
+      <div class="filters-row">
+        <span style="font-size: var(--text-xs); font-weight: 600; color: var(--color-text-muted);">PRICE:</span>
+        <button class="filter-chip active" data-price="all" onclick="setFilter('price', 'all', this)">All</button>
+        <button class="filter-chip" data-price="low" onclick="setFilter('price', 'low', this)">Under ₹30/hr</button>
+        <button class="filter-chip" data-price="mid" onclick="setFilter('price', 'mid', this)">₹30–₹60/hr</button>
+        <button class="filter-chip" data-price="high" onclick="setFilter('price', 'high', this)">₹60+/hr</button>
+        <span style="font-size: var(--text-xs); font-weight: 600; color: var(--color-text-muted); margin-left: var(--space-2);">STATUS:</span>
+        <button class="filter-chip active" data-status="all" onclick="setFilter('status', 'all', this)">All</button>
+        <button class="filter-chip" data-status="available" onclick="setFilter('status', 'available', this)">Available</button>
+        <div class="results-count" id="results-count">Showing 0 spots</div>
+      </div>
+
+      <!-- Cards Grid -->
+      <div class="cards-grid" id="parking-cards-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LIST YOUR SPACE PAGE ===== -->
+  <div class="page" id="page-list">
+    <div class="container">
+      <div class="section-header">
+        <h2>List Your Parking Space</h2>
+        <p>Register your empty space and start earning from drivers who need parking nearby</p>
+      </div>
+
+      <div class="form-card">
+        <h2>Add New Parking Spot</h2>
+        <p>Fill in the details below. It only takes 2 minutes.</p>
+
+        <form id="list-form" onsubmit="submitListing(event)">
+          <div class="form-section-title">Location Details</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Space Name <span>*</span></label>
+              <input type="text" id="f-name" placeholder="e.g. Sharma Ji Parking" required />
+            </div>
+            <div class="form-group">
+              <label>City <span>*</span></label>
+              <select id="f-city" required>
+                <option value="">Select City</option>
+                <option>Mumbai</option>
+                <option>Pune</option>
+                <option>Bengaluru</option>
+                <option>Hyderabad</option>
+                <option>Kanpur</option>
+                <option>Girgaon</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Full Address <span>*</span></label>
+            <input type="text" id="f-address" placeholder="e.g. Near Chhatrapati Shivaji Market, Dadar" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Area / Locality <span>*</span></label>
+              <input type="text" id="f-area" placeholder="e.g. Dadar West" required />
+            </div>
+            <div class="form-group">
+              <label>Landmark</label>
+              <input type="text" id="f-landmark" placeholder="e.g. Opposite McDonald's" />
+            </div>
+          </div>
+
+          <hr class="form-divider" />
+          <div class="form-section-title">Parking Details</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Vehicle Type <span>*</span></label>
+              <select id="f-vehicle" required>
+                <option value="">Select Type</option>
+                <option value="Car">Car Only</option>
+                <option value="Bike">Bike / Two-Wheeler</option>
+                <option value="Both">Both Car & Bike</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Total Slots <span>*</span></label>
+              <input type="number" id="f-slots" placeholder="e.g. 10" min="1" max="500" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Price per Hour (₹) <span>*</span></label>
+              <input type="number" id="f-price" placeholder="e.g. 30" min="5" required />
+              <div class="form-hint">Suggested: ₹20–₹80/hr based on area</div>
+            </div>
+            <div class="form-group">
+              <label>Parking Type</label>
+              <select id="f-type">
+                <option value="Open">Open / Street</option>
+                <option value="Covered">Covered</option>
+                <option value="Basement">Basement</option>
+                <option value="Multi-level">Multi-level</option>
+              </select>
+            </div>
+          </div>
+
+          <hr class="form-divider" />
+          <div class="form-section-title">Timing & Availability</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Open From</label>
+              <input type="time" id="f-open" value="06:00" />
+            </div>
+            <div class="form-group">
+              <label>Open Until</label>
+              <input type="time" id="f-close" value="23:00" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-section-title" style="margin-bottom: var(--space-2);">Amenities (Optional)</div>
+            <div class="checkbox-group">
+              <label class="checkbox-label"><input type="checkbox" id="f-cctv" /> CCTV Camera</label>
+              <label class="checkbox-label"><input type="checkbox" id="f-guard" /> Security Guard</label>
+              <label class="checkbox-label"><input type="checkbox" id="f-ev" /> EV Charging</label>
+              <label class="checkbox-label"><input type="checkbox" id="f-wash" /> Car Wash</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Owner Contact Number <span>*</span></label>
+            <input type="tel" id="f-phone" placeholder="e.g. 98765 43210" required pattern="[0-9]{10}" />
+            <div class="form-hint">Drivers will contact you on this number</div>
+          </div>
+
+          <div class="form-group">
+            <label>Additional Notes</label>
+            <textarea id="f-notes" placeholder="e.g. Entry from back lane, call before arriving..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: var(--space-3); justify-content: flex-end;">
+            <button type="button" class="btn btn-outline" onclick="resetListForm()">Clear Form</button>
+            <button type="submit" class="btn btn-primary">
+              <i data-lucide="plus-circle" style="width:15px;height:15px"></i>
+              Submit Listing
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BOOKINGS PAGE ===== -->
+  <div class="page" id="page-bookings">
+    <div class="container">
+      <div class="section-header">
+        <h2>My Bookings & Listings</h2>
+        <p>Manage your parking bookings and spaces you have listed</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('bookings-tab', this)">My Bookings</button>
+        <button class="tab-btn" onclick="switchTab('listings-tab', this)">My Listings</button>
+      </div>
+
+      <div class="tab-content active" id="tab-bookings-tab">
+        <div id="bookings-list"></div>
+      </div>
+      <div class="tab-content" id="tab-listings-tab">
+        <div id="listings-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BOOKING MODAL ===== -->
+  <div class="modal-overlay" id="booking-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Book Parking Spot</h3>
+        <button class="modal-close" onclick="closeModal()">
+          <i data-lucide="x" style="width:18px;height:18px"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- filled by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmBooking()">
+          <i data-lucide="check" style="width:15px;height:15px"></i>
+          Confirm Booking
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+    // ============================================================
+    //  DEMO DATA — Parking spots across Indian cities
+    // ============================================================
+    const DEMO_SPOTS = [
+      // MUMBAI
+      { id: 1, name: "Andheri Station Parking", city: "Mumbai", area: "Andheri West", address: "Near Andheri Railway Station, SV Road", vehicle: "Both", slots: 40, available: 12, price: 40, type: "Covered", open: "05:00", close: "23:59", cctv: true, guard: true, ev: false, wash: false, phone: "9876543210" },
+      { id: 2, name: "Bandra Kurla Complex Lot", city: "Mumbai", area: "BKC", address: "G Block, Bandra Kurla Complex", vehicle: "Car", slots: 80, available: 5, price: 70, type: "Multi-level", open: "06:00", close: "22:00", cctv: true, guard: true, ev: true, wash: false, phone: "9123456780" },
+      { id: 3, name: "Dadar Market Parking", city: "Mumbai", area: "Dadar", address: "Near Dadar Vegetable Market, LBS Marg", vehicle: "Both", slots: 25, available: 0, price: 30, type: "Open", open: "06:00", close: "21:00", cctv: false, guard: false, ev: false, wash: false, phone: "9988776655" },
+      { id: 4, name: "Malad West Private Lot", city: "Mumbai", area: "Malad West", address: "Beside Infinity Mall, Link Road", vehicle: "Car", slots: 30, available: 18, price: 50, type: "Basement", open: "09:00", close: "23:00", cctv: true, guard: false, ev: false, wash: true, phone: "9090909090" },
+      // GIRGAON
+      { id: 5, name: "Girgaon Chowpatty Parking", city: "Girgaon", area: "Girgaon", address: "Near Chowpatty Beach, Marine Lines", vehicle: "Both", slots: 20, available: 8, price: 25, type: "Open", open: "07:00", close: "23:00", cctv: false, guard: true, ev: false, wash: false, phone: "9321654870" },
+      { id: 6, name: "Opera House Lot", city: "Girgaon", area: "Opera House", address: "Opposite New Empire Cinema, Charni Rd", vehicle: "Bike", slots: 50, available: 30, price: 15, type: "Open", open: "06:00", close: "22:00", cctv: true, guard: false, ev: false, wash: false, phone: "9900112233" },
+      // PUNE
+      { id: 7, name: "Koregaon Park Secure Lot", city: "Pune", area: "Koregaon Park", address: "Lane 6, Koregaon Park Main Road", vehicle: "Both", slots: 35, available: 20, price: 35, type: "Covered", open: "00:00", close: "23:59", cctv: true, guard: true, ev: true, wash: false, phone: "9822334455" },
+      { id: 8, name: "FC Road Parking Zone", city: "Pune", area: "Fergusson College Road", address: "Near ABC Farms, FC Road", vehicle: "Bike", slots: 100, available: 65, price: 10, type: "Open", open: "07:00", close: "22:00", cctv: false, guard: false, ev: false, wash: false, phone: "9765123456" },
+      { id: 9, name: "Kalyani Nagar Tower Parking", city: "Pune", area: "Kalyani Nagar", address: "Tower 3, EON IT Park Road", vehicle: "Car", slots: 60, available: 4, price: 60, type: "Basement", open: "06:00", close: "22:00", cctv: true, guard: true, ev: true, wash: true, phone: "9800012345" },
+      // BENGALURU
+      { id: 10, name: "MG Road Smart Parking", city: "Bengaluru", area: "MG Road", address: "Opposite Trinity Metro Station, MG Road", vehicle: "Both", slots: 120, available: 45, price: 45, type: "Multi-level", open: "06:00", close: "23:00", cctv: true, guard: true, ev: true, wash: false, phone: "9845001122" },
+      { id: 11, name: "Koramangala Community Lot", city: "Bengaluru", area: "Koramangala", address: "80 Feet Road, 4th Block, Koramangala", vehicle: "Car", slots: 50, available: 22, price: 40, type: "Open", open: "07:00", close: "23:00", cctv: true, guard: false, ev: false, wash: false, phone: "9731456782" },
+      { id: 12, name: "Indiranagar Double Road Lot", city: "Bengaluru", area: "Indiranagar", address: "100 Feet Rd, near CMH Road Junction", vehicle: "Bike", slots: 80, available: 55, price: 10, type: "Open", open: "00:00", close: "23:59", cctv: false, guard: false, ev: false, wash: false, phone: "9886543210" },
+      { id: 13, name: "Whitefield Tech Park Parking", city: "Bengaluru", area: "Whitefield", address: "International Tech Park, Whitefield Road", vehicle: "Car", slots: 200, available: 0, price: 80, type: "Multi-level", open: "06:00", close: "22:00", cctv: true, guard: true, ev: true, wash: true, phone: "9845990011" },
+      // HYDERABAD
+      { id: 14, name: "HITEC City Parking Hub", city: "Hyderabad", area: "HITEC City", address: "Beside Cyber Towers, HITEC City Main Rd", vehicle: "Both", slots: 150, available: 70, price: 30, type: "Covered", open: "00:00", close: "23:59", cctv: true, guard: true, ev: true, wash: false, phone: "9848001234" },
+      { id: 15, name: "Banjara Hills Smart Lot", city: "Hyderabad", area: "Banjara Hills", address: "Road No. 12, Banjara Hills", vehicle: "Car", slots: 45, available: 10, price: 50, type: "Basement", open: "08:00", close: "23:00", cctv: true, guard: true, ev: false, wash: true, phone: "9000112233" },
+      { id: 16, name: "Charminar Area Parking", city: "Hyderabad", area: "Old City", address: "Near Laad Bazaar, Charminar", vehicle: "Bike", slots: 60, available: 35, price: 15, type: "Open", open: "07:00", close: "21:00", cctv: false, guard: true, ev: false, wash: false, phone: "9100223344" },
+      // KANPUR
+      { id: 17, name: "Mall Road Commercial Parking", city: "Kanpur", area: "Mall Road", address: "Civil Lines, near Company Garden", vehicle: "Both", slots: 30, available: 15, price: 20, type: "Open", open: "07:00", close: "21:00", cctv: false, guard: false, ev: false, wash: false, phone: "9415123456" },
+      { id: 18, name: "Z Square Mall Basement", city: "Kanpur", area: "Sarvodaya Nagar", address: "Z Square Mall, GT Road, Kanpur", vehicle: "Car", slots: 120, available: 88, price: 25, type: "Basement", open: "10:00", close: "22:30", cctv: true, guard: true, ev: false, wash: false, phone: "9839001122" },
+      { id: 19, name: "Naveen Market Lot", city: "Kanpur", area: "Naveen Market", address: "Behind Naveen Market, Birhana Road", vehicle: "Bike", slots: 40, available: 22, price: 10, type: "Open", open: "06:00", close: "22:00", cctv: false, guard: false, ev: false, wash: false, phone: "9452234567" },
+    ];
+
+    // Active filters
+    let filters = { price: 'all', status: 'all' };
+    let selectedSpotId = null;
+    // My bookings & listings stored in memory
+    let myBookings = [
+      { id: 'B001', spotId: 1, spotName: "Andheri Station Parking", city: "Mumbai", area: "Andheri West", date: "2026-04-13", hours: 2, price: 40, status: "active", vehicle: "Car - MH01 AB 1234" },
+      { id: 'B002', spotId: 7, spotName: "Koregaon Park Secure Lot", city: "Pune", area: "Koregaon Park", date: "2026-04-12", hours: 1, price: 35, status: "completed", vehicle: "Bike - MH12 XY 5678" },
+    ];
+    let myListings = [];
+
+    // ============================================================
+    //  PAGE NAVIGATION
+    // ============================================================
+    function showPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('page-' + page).classList.add('active');
+      document.getElementById('nav-' + page).classList.add('active');
+      if (page === 'find') renderParkingCards();
+      if (page === 'bookings') renderBookings();
+      if (page === 'home') animateStats();
+    }
+
+    // ============================================================
+    //  STATS ANIMATION
+    // ============================================================
+    function animateStats() {
+      const allSpots = DEMO_SPOTS.length + myListings.length;
+      const owners = 12 + myListings.length;
+      animateNumber('stat-spots', allSpots);
+      animateNumber('stat-bookings', 47 + myBookings.length);
+      animateNumber('stat-owners', owners);
+    }
+    function animateNumber(id, target) {
+      const el = document.getElementById(id);
+      let current = 0;
+      const step = Math.ceil(target / 25);
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = current;
+        if (current >= target) clearInterval(timer);
+      }, 40);
+    }
+
+    // ============================================================
+    //  CITY PILLS on HOME
+    // ============================================================
+    function renderCityPills() {
+      const cities = ['Mumbai', 'Girgaon', 'Pune', 'Bengaluru', 'Hyderabad', 'Kanpur'];
+      const el = document.getElementById('city-pills');
+      el.innerHTML = cities.map(c => {
+        const count = DEMO_SPOTS.filter(s => s.city === c).length;
+        return `<div style="
+          background: var(--color-surface);
+          border: 1px solid var(--color-border);
+          border-radius: var(--radius-md);
+          padding: var(--space-3) var(--space-5);
+          cursor: pointer;
+          transition: all 0.15s;
+          display: flex; align-items: center; gap: var(--space-2);
+        " onmouseover="this.style.borderColor='var(--color-primary)'" 
+           onmouseout="this.style.borderColor='var(--color-border)'"
+           onclick="goFindCity('${c}')">
+          <span style="font-size: var(--text-sm); font-weight: 600;">${c}</span>
+          <span style="font-size: var(--text-xs); background: var(--color-primary-light); color: var(--color-primary); padding: 1px 8px; border-radius: var(--radius-full); font-weight: 600;">${count} spots</span>
+        </div>`;
+      }).join('');
+    }
+    function goFindCity(city) {
+      document.getElementById('search-city').value = city;
+      showPage('find');
+    }
+
+    // ============================================================
+    //  PARKING CARDS
+    // ============================================================
+    function renderParkingCards() {
+      const city = document.getElementById('search-city').value;
+      const keyword = document.getElementById('search-keyword').value.toLowerCase().trim();
+      const vehicle = document.getElementById('search-vehicle').value;
+
+      let spots = [...DEMO_SPOTS, ...myListings];
+
+      if (city) spots = spots.filter(s => s.city === city);
+      if (keyword) spots = spots.filter(s =>
+        s.name.toLowerCase().includes(keyword) ||
+        s.area.toLowerCase().includes(keyword) ||
+        s.address.toLowerCase().includes(keyword)
+      );
+      if (vehicle) spots = spots.filter(s => s.vehicle === vehicle || s.vehicle === 'Both' || (vehicle === 'Both'));
+      if (filters.price === 'low') spots = spots.filter(s => s.price < 30);
+      if (filters.price === 'mid') spots = spots.filter(s => s.price >= 30 && s.price <= 60);
+      if (filters.price === 'high') spots = spots.filter(s => s.price > 60);
+      if (filters.status === 'available') spots = spots.filter(s => s.available > 0);
+
+      document.getElementById('results-count').textContent = `Showing ${spots.length} spot${spots.length !== 1 ? 's' : ''}`;
+      const grid = document.getElementById('parking-cards-grid');
+
+      if (spots.length === 0) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">
+          <div class="empty-state-icon"><i data-lucide="search-x" style="width:24px;height:24px"></i></div>
+          <h3>No spots found</h3>
+          <p>Try changing your city, keyword, or filters.</p>
+          <button class="btn btn-primary btn-sm" onclick="clearSearch()">Clear Filters</button>
+        </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = spots.map(s => {
+        const statusBadge = s.available === 0
+          ? `<span class="badge badge-full">Full</span>`
+          : s.available <= 5
+          ? `<span class="badge badge-limited">${s.available} left</span>`
+          : `<span class="badge badge-available">${s.available} available</span>`;
+        const vehicleBadge = s.vehicle === 'Car'
+          ? `<span class="badge badge-car">Car</span>`
+          : s.vehicle === 'Bike'
+          ? `<span class="badge badge-bike">Bike</span>`
+          : `<span class="badge badge-both">Car + Bike</span>`;
+        const amenities = [
+          s.cctv ? 'CCTV' : null, s.guard ? 'Guard' : null,
+          s.ev ? 'EV' : null, s.wash ? 'Car Wash' : null
+        ].filter(Boolean);
+        const amenitiesHtml = amenities.length
+          ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:var(--space-2);">
+              ${amenities.map(a => `<span style="font-size:11px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-full);padding:1px 7px;color:var(--color-text-muted);">${a}</span>`).join('')}
+            </div>` : '';
+        return `<div class="parking-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">${s.name}</div>
+              <div class="card-address"><i data-lucide="map-pin" style="width:11px;height:11px"></i> ${s.area}, ${s.city}</div>
+            </div>
+            ${statusBadge}
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <div class="meta-item"><i data-lucide="car" style="width:13px;height:13px"></i><strong>${s.type}</strong></div>
+              <div class="meta-item"><i data-lucide="clock" style="width:13px;height:13px"></i><strong>${s.open}–${s.close}</strong></div>
+              <div class="meta-item"><i data-lucide="layers" style="width:13px;height:13px"></i><strong>${s.slots} total slots</strong></div>
+              ${vehicleBadge}
+            </div>
+            <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-bottom: var(--space-1);">${s.address}</div>
+            ${amenitiesHtml}
+          </div>
+          <div class="card-footer">
+            <div class="price-tag">₹${s.price} <span>/ hour</span></div>
+            <button class="btn btn-primary btn-sm" ${s.available === 0 ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''} onclick="openBookingModal(${s.id})">
+              ${s.available === 0 ? 'Full' : 'Book Now'}
+            </button>
+          </div>
+        </div>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function clearSearch() {
+      document.getElementById('search-city').value = '';
+      document.getElementById('search-keyword').value = '';
+      document.getElementById('search-vehicle').value = '';
+      filters = { price: 'all', status: 'all' };
+      document.querySelectorAll('.filter-chip').forEach(c => {
+        if (c.dataset.price === 'all' || c.dataset.status === 'all') c.classList.add('active');
+        else c.classList.remove('active');
+      });
+      renderParkingCards();
+    }
+
+    function setFilter(type, value, btn) {
+      filters[type] = value;
+      document.querySelectorAll(`.filter-chip[data-${type}]`).forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderParkingCards();
+    }
+
+    // ============================================================
+    //  BOOKING MODAL
+    // ============================================================
+    function openBookingModal(spotId) {
+      const allSpots = [...DEMO_SPOTS, ...myListings];
+      const spot = allSpots.find(s => s.id === spotId);
+      if (!spot) return;
+      selectedSpotId = spotId;
+      const modal = document.getElementById('booking-modal');
+      document.getElementById('modal-body').innerHTML = `
+        <div class="modal-info">
+          <i data-lucide="info" style="width:16px;height:16px;flex-shrink:0"></i>
+          This is a demo booking — no real payment required.
+        </div>
+        <div class="modal-detail-row"><span class="modal-detail-label">Spot Name</span><span class="modal-detail-value">${spot.name}</span></div>
+        <div class="modal-detail-row"><span class="modal-detail-label">Location</span><span class="modal-detail-value">${spot.area}, ${spot.city}</span></div>
+        <div class="modal-detail-row"><span class="modal-detail-label">Vehicle Type</span><span class="modal-detail-value">${spot.vehicle}</span></div>
+        <div class="modal-detail-row"><span class="modal-detail-label">Available Slots</span><span class="modal-detail-value" style="color: var(--color-success);">${spot.available}</span></div>
+        <div class="modal-detail-row"><span class="modal-detail-label">Rate</span><span class="modal-detail-value" style="color: var(--color-primary);">₹${spot.price} / hour</span></div>
+        <div class="modal-detail-row"><span class="modal-detail-label">Owner Contact</span><span class="modal-detail-value">${spot.phone}</span></div>
+        <div style="margin-top: var(--space-4);">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3);">
+            <div>
+              <label style="font-size: var(--text-sm); font-weight: 600; display: block; margin-bottom: 4px;">Your Vehicle No.</label>
+              <input type="text" id="modal-vehicle" placeholder="e.g. MH01 AB 1234" style="width:100%;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:6px 10px;background:var(--color-bg);font-size:var(--text-sm);color:var(--color-text);outline:none;" />
+            </div>
+            <div>
+              <label style="font-size: var(--text-sm); font-weight: 600; display: block; margin-bottom: 4px;">Hours Needed</label>
+              <input type="number" id="modal-hours" value="2" min="1" max="24" style="width:100%;border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:6px 10px;background:var(--color-bg);font-size:var(--text-sm);color:var(--color-text);outline:none;" />
+            </div>
+          </div>
+        </div>
+      `;
+      modal.classList.add('open');
+      lucide.createIcons();
+    }
+    function closeModal() {
+      document.getElementById('booking-modal').classList.remove('open');
+      selectedSpotId = null;
+    }
+    function confirmBooking() {
+      if (!selectedSpotId) return;
+      const allSpots = [...DEMO_SPOTS, ...myListings];
+      const spot = allSpots.find(s => s.id === selectedSpotId);
+      const vehicleNo = document.getElementById('modal-vehicle').value.trim() || 'Not specified';
+      const hours = parseInt(document.getElementById('modal-hours').value) || 2;
+      const bookingId = 'B' + String(Date.now()).slice(-5);
+      const today = new Date().toISOString().split('T')[0];
+      myBookings.unshift({
+        id: bookingId, spotId: selectedSpotId,
+        spotName: spot.name, city: spot.city, area: spot.area,
+        date: today, hours: hours, price: spot.price,
+        status: 'active', vehicle: vehicleNo
+      });
+      // Reduce available count
+      const demoIdx = DEMO_SPOTS.findIndex(s => s.id === selectedSpotId);
+      if (demoIdx !== -1 && DEMO_SPOTS[demoIdx].available > 0) DEMO_SPOTS[demoIdx].available--;
+      const listIdx = myListings.findIndex(s => s.id === selectedSpotId);
+      if (listIdx !== -1 && myListings[listIdx].available > 0) myListings[listIdx].available--;
+      closeModal();
+      showToast(`Booking confirmed! ₹${spot.price * hours} total for ${hours}h at ${spot.name}`, 'success');
+      renderParkingCards();
+    }
+
+    // ============================================================
+    //  LIST YOUR SPACE
+    // ============================================================
+    let listingIdCounter = 1000;
+    function submitListing(event) {
+      event.preventDefault();
+      const amenities = [];
+      if (document.getElementById('f-cctv').checked) amenities.push('CCTV');
+      if (document.getElementById('f-guard').checked) amenities.push('Guard');
+      if (document.getElementById('f-ev').checked) amenities.push('EV');
+      if (document.getElementById('f-wash').checked) amenities.push('Wash');
+      const newSpot = {
+        id: ++listingIdCounter,
+        name: document.getElementById('f-name').value,
+        city: document.getElementById('f-city').value,
+        area: document.getElementById('f-area').value,
+        address: document.getElementById('f-address').value + (document.getElementById('f-landmark').value ? ', ' + document.getElementById('f-landmark').value : ''),
+        vehicle: document.getElementById('f-vehicle').value,
+        slots: parseInt(document.getElementById('f-slots').value),
+        available: parseInt(document.getElementById('f-slots').value),
+        price: parseInt(document.getElementById('f-price').value),
+        type: document.getElementById('f-type').value,
+        open: document.getElementById('f-open').value,
+        close: document.getElementById('f-close').value,
+        cctv: document.getElementById('f-cctv').checked,
+        guard: document.getElementById('f-guard').checked,
+        ev: document.getElementById('f-ev').checked,
+        wash: document.getElementById('f-wash').checked,
+        phone: document.getElementById('f-phone').value,
+        notes: document.getElementById('f-notes').value,
+        isMyListing: true
+      };
+      myListings.push(newSpot);
+      showToast(`"${newSpot.name}" listed successfully! Drivers can now find your space.`, 'success');
+      document.getElementById('list-form').reset();
+      showPage('bookings');
+      setTimeout(() => switchTab('listings-tab', document.querySelectorAll('.tab-btn')[1]), 100);
+    }
+    function resetListForm() {
+      document.getElementById('list-form').reset();
+      showToast('Form cleared.', 'success');
+    }
+
+    // ============================================================
+    //  BOOKINGS & LISTINGS RENDER
+    // ============================================================
+    function renderBookings() {
+      const bookingsEl = document.getElementById('bookings-list');
+      if (myBookings.length === 0) {
+        bookingsEl.innerHTML = `<div class="empty-state">
+          <div class="empty-state-icon"><i data-lucide="bookmark" style="width:22px;height:22px"></i></div>
+          <h3>No bookings yet</h3>
+          <p>Find a parking spot and book it to see your reservations here.</p>
+          <button class="btn btn-primary" onclick="showPage('find')">Find Parking</button>
+        </div>`;
+      } else {
+        bookingsEl.innerHTML = `<div class="bookings-list">` + myBookings.map(b => {
+          const statusBadge = b.status === 'active'
+            ? `<span class="badge badge-available">Active</span>`
+            : `<span class="badge" style="background:var(--color-surface-2);color:var(--color-text-muted);">Completed</span>`;
+          return `<div class="booking-card">
+            <div class="booking-info">
+              <div class="booking-name">${b.spotName}</div>
+              <div class="booking-details">
+                <span><i data-lucide="map-pin" style="width:12px;height:12px;vertical-align:middle"></i> ${b.area}, ${b.city}</span>
+                <span><i data-lucide="calendar" style="width:12px;height:12px;vertical-align:middle"></i> ${b.date}</span>
+                <span><i data-lucide="clock" style="width:12px;height:12px;vertical-align:middle"></i> ${b.hours} hour(s)</span>
+                <span><i data-lucide="car" style="width:12px;height:12px;vertical-align:middle"></i> ${b.vehicle}</span>
+              </div>
+            </div>
+            <div class="booking-status">
+              ${statusBadge}
+              <div style="font-size:var(--text-base);font-weight:700;color:var(--color-primary)">₹${b.price * b.hours}</div>
+            </div>
+            <div class="booking-actions">
+              ${b.status === 'active' ? `<button class="btn btn-outline btn-sm" onclick="cancelBooking('${b.id}')">Cancel</button>` : ''}
+            </div>
+          </div>`;
+        }).join('') + `</div>`;
+      }
+
+      const listingsEl = document.getElementById('listings-list');
+      if (myListings.length === 0) {
+        listingsEl.innerHTML = `<div class="empty-state">
+          <div class="empty-state-icon"><i data-lucide="plus-circle" style="width:22px;height:22px"></i></div>
+          <h3>You have no listings yet</h3>
+          <p>List your empty parking space and start earning money from nearby drivers.</p>
+          <button class="btn btn-primary" onclick="showPage('list')">List Your Space</button>
+        </div>`;
+      } else {
+        listingsEl.innerHTML = `<div class="bookings-list">` + myListings.map(s => {
+          return `<div class="booking-card">
+            <div class="booking-info">
+              <div class="booking-name">${s.name}</div>
+              <div class="booking-details">
+                <span>${s.area}, ${s.city}</span>
+                <span>₹${s.price}/hr</span>
+                <span>${s.slots} slots</span>
+                <span>${s.vehicle}</span>
+              </div>
+            </div>
+            <div class="booking-status">
+              <span class="badge badge-available">Live</span>
+            </div>
+            <div class="booking-actions">
+              <button class="btn btn-danger btn-sm" onclick="removeListing(${s.id})">Remove</button>
+            </div>
+          </div>`;
+        }).join('') + `</div>`;
+      }
+      lucide.createIcons();
+    }
+
+    function cancelBooking(id) {
+      const idx = myBookings.findIndex(b => b.id === id);
+      if (idx !== -1) {
+        myBookings[idx].status = 'completed';
+        showToast('Booking cancelled successfully.', 'success');
+        renderBookings();
+      }
+    }
+    function removeListing(id) {
+      myListings = myListings.filter(s => s.id !== id);
+      showToast('Listing removed.', 'success');
+      renderBookings();
+    }
+
+    // ============================================================
+    //  TABS
+    // ============================================================
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // ============================================================
+    //  TOAST
+    // ============================================================
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      const icon = type === 'success' ? 'check-circle' : 'alert-circle';
+      toast.innerHTML = `<span class="toast-icon" style="color: var(--color-${type})"><i data-lucide="${icon}" style="width:18px;height:18px"></i></span><span>${message}</span>`;
+      container.appendChild(toast);
+      lucide.createIcons();
+      setTimeout(() => {
+        toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; toast.style.transition = 'all 0.25s ease';
+        setTimeout(() => toast.remove(), 260);
+      }, 3500);
+    }
+
+    // ============================================================
+    //  DARK MODE TOGGLE
+    // ============================================================
+    (function() {
+      const t = document.querySelector('[data-theme-toggle]');
+      const r = document.documentElement;
+      let d = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      r.setAttribute('data-theme', d);
+      updateToggleIcon(t, d);
+      t && t.addEventListener('click', () => {
+        d = d === 'dark' ? 'light' : 'dark';
+        r.setAttribute('data-theme', d);
+        updateToggleIcon(t, d);
+      });
+      function updateToggleIcon(btn, mode) {
+        if (!btn) return;
+        btn.innerHTML = mode === 'dark'
+          ? `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`
+          : `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+      }
+    })();
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderCityPills();
+      animateStats();
+    });
+  </script>
+</body>
+</html>

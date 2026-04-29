@@ -1,0 +1,73 @@
+/* App Component Styles */
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header Styles */
+.app-header {
+  text-align: center;
+  color: white;
+  padding: 30px 20px;
+  margin-bottom: 30px;
+}
+
+.app-header h1 {
+  font-size: 42px;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.app-header p {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+/* Product Grid - Responsive Grid Layout */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 0 20px;
+  margin-bottom: 40px;
+}
+
+/* Footer Styles */
+.app-footer {
+  text-align: center;
+  color: white;
+  padding: 20px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* Responsive Grid Layouts */
+
+/* Tablet View - 2 columns */
+@media (max-width: 992px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .app-header h1 {
+    font-size: 36px;
+  }
+}
+
+/* Mobile View - 1 column */
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .app-header h1 {
+    font-size: 28px;
+  }
+
+  .app-header p {
+    font-size: 14px;
+  }
+}
